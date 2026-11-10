@@ -1,7 +1,9 @@
+#define _POSIX_C_SOURCE 200809L
+
 #include "analyze.h"
 #include "algorithm.h"
-#include <stdlib.h>
 
+#include <stdlib.h>
 #include <time.h>
 
 //
@@ -80,7 +82,9 @@ void benchmark(const algorithm_t a, const case_t c, result_t *buf, int n)
 
         prepare_input(a, c, testValues, elementCount);
 
-        clock_t start = clock();
+        struct timespec start, end;
+
+        clock_gettime(CLOCK_MONOTONIC, &start);
 
         switch (a) 
         {
@@ -109,9 +113,9 @@ void benchmark(const algorithm_t a, const case_t c, result_t *buf, int n)
                 break;
         }
 
-        clock_t end = clock();
+        clock_gettime(CLOCK_MONOTONIC, &end);
 
-        double seconds = (double)(end-start) / CLOCKS_PER_SEC;
+        double seconds = (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec) / 1e9;
 
         buf[i].size = elementCount;
         buf[i].time = seconds;

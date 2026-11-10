@@ -3,7 +3,7 @@
 CC=gcc
 CFLAGS=-Wall -Werror -std=c99 
 ifeq ($(OS),Windows_NT)
-	LFLAGS = -lm
+	LFLAGS = -lm -lpthread
 else ifeq ($(shell uname -s), Darwin)
 	LFLAGS = 
 else	

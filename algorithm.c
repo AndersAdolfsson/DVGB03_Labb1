@@ -15,6 +15,7 @@ void bubble_sort(int *a, int n)
 void insertion_sort(int *a, int n) 
 {
 	// TODO: insertion sort
+	//
 }
 
 void quick_sort(int *a, int n) 

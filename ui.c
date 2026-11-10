@@ -37,7 +37,7 @@ static void ui_line(char c, int n)
 
 static void ui_print_results(const result_t *results, int count)
 {
-	prinf("%12s %16s\n", "Antal", "Tid (sekunder)");
+	printf("%12s %16s\n", "Antal", "Tid (sekunder)");
 	ui_line('-', MENU_WIDTH);
 
 	for(int i=0; i<count; i++)

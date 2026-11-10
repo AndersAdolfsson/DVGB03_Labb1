@@ -5,7 +5,8 @@
 #define ITERATIONS 4
 
 // algorithm_t defines different algorithms
-typedef enum {
+typedef enum
+{
 	bubble_sort_t,
 	insertion_sort_t,
 	quick_sort_t,
@@ -14,14 +15,16 @@ typedef enum {
 } algorithm_t;
 
 // case_t defines different cases
-typedef enum {
+typedef enum
+{
 	best_t,
 	worst_t,
 	average_t,
 } case_t;
 
 // result_t defines a timed measurement for a given array size
-typedef struct {
+typedef struct
+{
 	int size;
 	double time;
 } result_t;

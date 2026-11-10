@@ -9,8 +9,7 @@ static void empty_stream()
 {
 	int c;
 
-	while ((c = getchar()) != EOF && c != '\n')
-		;
+	while ((c = getchar()) != EOF && c != '\n');
 }
 
 //
@@ -20,13 +19,15 @@ int read_line(char *buf, int n)
 {
 	int buf_size;
 
-	if (!fgets(buf, n, stdin)) {
+	if (!fgets(buf, n, stdin))
+	{
 		empty_stream();
 		return 0; // overflow
 	}
 
 	buf_size = strlen(buf);
-	if (buf[buf_size-1] != '\n') {
+	if (buf[buf_size-1] != '\n')
+	{
 		empty_stream();
 		return 0; // overflow
 	}

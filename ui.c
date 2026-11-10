@@ -28,7 +28,8 @@ static char ui_get_choice()
 
 static void ui_line(char c, int n)
 {
-	while (n-- > 0) {
+	while (n-- > 0)
+	{
 		putchar(c);
 	}
 	putchar('\n');
@@ -38,14 +39,16 @@ static void ui_menu_options(const char *options[], int num_options)
 {
 	int i;
 
-	for (i=0; i<num_options; i++) {
+	for (i=0; i<num_options; i++)
+	{
 		printf("    %c) %s\n", 'a'+i, options[i]);
 	}
 }
 
 static void ui_menu()
 {
-	const char *options[] = {
+	const char *options[] = 
+	{
 		"Menu",
 		"Exit\n",
 		"Bubble sort best case",
@@ -67,12 +70,15 @@ void ui_run()
 	
 	show_menu = true;
 	running = true;
-	while (running) {
-		if (show_menu) {
+	while (running) 
+	{
+		if (show_menu) 
+		{
 			show_menu = false;
 			ui_menu();
 		}
-		switch (ui_get_choice()) {
+		switch (ui_get_choice()) 
+		{
 			// House keeping
 			case 'a':
 				show_menu = true;

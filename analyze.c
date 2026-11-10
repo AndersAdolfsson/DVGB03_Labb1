@@ -28,9 +28,10 @@ static void fill_descending(int *values, int size)
 
 static void fill_random(int *values, int size)
 {
+    // Fill ascending first to avoid duplicate entries
     fill_ascending(values, size);
 
-    // shuffle values to random order
+    // Shuffle values to random order
     for (int i = size - 1; i > 0; i--)
     {
         int j = rand() % (i + 1);
@@ -43,6 +44,8 @@ static void fill_random(int *values, int size)
 
 static void prepare_input(algorithm_t algoritm, case_t test_case, int *values, int size)
 {
+    // Each algorithm needs different data to be best/worst/average,
+    // pick appropriate helper function for each algorithm
     switch (algoritm) 
     {
         case bubble_sort_t:
@@ -78,6 +81,8 @@ void benchmark(const algorithm_t a, const case_t c, result_t *buf, int n)
 {    
     int elementCount = SIZE_START;
     
+    // Generate test data for the amount of results expected,
+    // double element count for each new iteration
     for(int i=0; i<n; i++)
     {
         double totalTime = 0;

@@ -7,17 +7,17 @@
 //
 // Public
 //
-void bubble_sort(int *a, int n)
+void bubble_sort(int *a, int n) 
 {
-	// TODO: bubble sort
+	// TODO: bubble sort //
 }
 
-void insertion_sort(int *a, int n)
+void insertion_sort(int *a, int n) 
 {
 	// TODO: insertion sort
 }
 
-void quick_sort(int *a, int n)
+void quick_sort(int *a, int n) 
 {
 	// TODO: quick sort
 }

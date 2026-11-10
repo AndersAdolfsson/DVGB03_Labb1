@@ -35,6 +35,17 @@ static void ui_line(char c, int n)
 	putchar('\n');
 }
 
+static void ui_print_results(const result_t *results, int count)
+{
+	prinf("%12s %16s\n", "Antal", "Tid (sekunder)");
+	ui_line('-', MENU_WIDTH);
+
+	for(int i=0; i<count; i++)
+	{
+		printf("%12d %16.9f\n", results[i].size, results[i].time);
+	}
+}
+
 static void ui_menu_options(const char *options[], int num_options)
 {
 	int i;
@@ -59,6 +70,8 @@ static void ui_menu()
 	ui_menu_options(options, sizeof(options) / sizeof(char *));
 	ui_line('-', MENU_WIDTH);
 }
+
+
 
 //
 // Public
@@ -89,7 +102,7 @@ void ui_run()
 			// Bubble sort
 			case 'c':
 				benchmark(bubble_sort_t, best_t, result, RESULT_ROWS);
-				printf("todo> implemenet BE + present results in FE\n");
+				ui_print_results(result, RESULT_ROWS);
 				break;
 			// Invalid input
 			default:

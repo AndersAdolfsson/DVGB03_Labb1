@@ -9,7 +9,7 @@
 //
 void bubble_sort(int *a, int n) 
 {
-	// TODO: bubble sort ///
+     //TODO BUBBELSORT
 }
 
 void insertion_sort(int *a, int n) 
@@ -25,6 +25,13 @@ void quick_sort(int *a, int n)
 
 bool linear_search(const int *a, int n, int v)
 {
+	for(int i = 0; i < n; i++)
+	{
+		if(a[i] == v)
+		{
+			return true;
+		}
+	}
 	return false; // TODO: linear search
 }
 

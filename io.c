@@ -36,3 +36,11 @@ int read_line(char *buf, int n)
 	buf[buf_size-1] = '\0';
 	return buf_size-1;
 }
+
+void enter_continue()
+{
+	printf("Press Enter to continue.\n");
+	char buf[1];
+	fgets(buf, 1, stdin);
+	empty_stream();
+}

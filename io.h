@@ -6,4 +6,6 @@
 // length of buf is returned, e.g., 5 for "hello" and 0 on error.
 int read_line(char *buf, int n);
 
+void enter_continue();
+
 #endif

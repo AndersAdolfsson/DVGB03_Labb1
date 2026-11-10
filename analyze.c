@@ -28,9 +28,16 @@ static void fill_descending(int *values, int size)
 
 static void fill_random(int *values, int size)
 {
-    for(int i=0; i<size; i++)
+    fill_ascending(values, size);
+
+    // shuffle values to random order
+    for (int i = size - 1; i > 0; i--)
     {
-        values[i] = rand() % (size + 1);
+        int j = rand() % (i + 1);
+
+        int temp = values[i];
+        values[i] = values[j];
+        values[j] = temp;
     }
 }
 
@@ -70,9 +77,10 @@ static void prepare_input(algorithm_t algoritm, case_t test_case, int *values, i
 void benchmark(const algorithm_t a, const case_t c, result_t *buf, int n)
 {    
     int elementCount = SIZE_START;
-
+    
     for(int i=0; i<n; i++)
     {
+        double totalTime = 0;
         int *testValues = malloc(elementCount * sizeof(*testValues));
         
         if(testValues == NULL)
@@ -80,24 +88,61 @@ void benchmark(const algorithm_t a, const case_t c, result_t *buf, int n)
             return;
         }
 
-        prepare_input(a, c, testValues, elementCount);
-
-        struct timespec start, end;
-
-        clock_gettime(CLOCK_MONOTONIC, &start);
-
         switch (a) 
         {
             case bubble_sort_t:
-                bubble_sort(testValues, elementCount);
+            {
+                for(int j=0; j<ITERATIONS; j++)
+                {
+                    prepare_input(a, c, testValues, elementCount);
+
+                    struct timespec start, end;
+
+                    clock_gettime(CLOCK_MONOTONIC, &start);
+                    bubble_sort(testValues, elementCount);
+                    clock_gettime(CLOCK_MONOTONIC, &end);
+
+                    const double seconds = (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec) / 1e9;
+
+                    totalTime += seconds;
+                }
+            }
                 break;
 
             case insertion_sort_t:
-                insertion_sort(testValues, elementCount);
+            for(int j=0; j<ITERATIONS; j++)
+                {
+                    prepare_input(a, c, testValues, elementCount);
+
+                    struct timespec start, end;
+
+                    clock_gettime(CLOCK_MONOTONIC, &start);
+                    insertion_sort(testValues, elementCount);
+                    clock_gettime(CLOCK_MONOTONIC, &end);
+
+                    const double seconds = (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec) / 1e9;
+
+                    totalTime += seconds;
+                }
+                
                 break;
 
             case quick_sort_t:
-                quick_sort(testValues, elementCount);
+            for(int j=0; j<ITERATIONS; j++)
+                {
+                    prepare_input(a, c, testValues, elementCount);
+
+                    struct timespec start, end;
+
+                    clock_gettime(CLOCK_MONOTONIC, &start);
+                    quick_sort(testValues, elementCount);
+                    clock_gettime(CLOCK_MONOTONIC, &end);
+
+                    const double seconds = (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec) / 1e9;
+
+                    totalTime += seconds;
+                }
+                
                 break;
 
             case linear_search_t:
@@ -113,12 +158,8 @@ void benchmark(const algorithm_t a, const case_t c, result_t *buf, int n)
                 break;
         }
 
-        clock_gettime(CLOCK_MONOTONIC, &end);
-
-        double seconds = (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec) / 1e9;
-
         buf[i].size = elementCount;
-        buf[i].time = seconds;
+        buf[i].time = totalTime/ITERATIONS;
 
         free(testValues);
 

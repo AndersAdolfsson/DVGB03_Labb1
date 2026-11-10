@@ -7,6 +7,7 @@
 // algorithm_t defines different algorithms
 typedef enum
 {
+	algo_none_t,
 	bubble_sort_t,
 	insertion_sort_t,
 	quick_sort_t,
@@ -17,9 +18,10 @@ typedef enum
 // case_t defines different cases
 typedef enum
 {
+	testcase_none_t,
 	best_t,
 	worst_t,
-	average_t,
+	average_t
 } case_t;
 
 // result_t defines a timed measurement for a given array size

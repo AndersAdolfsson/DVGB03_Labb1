@@ -20,10 +20,10 @@ static void ui_exit()
 
 static char ui_get_choice()
 {
-	char buf[3];
+	char buf[INPUT_BUFFER_SMALL];
 
 	printf("input> ");
-	return read_line(buf, 3) ? buf[0] : 0;
+	return read_line(buf, INPUT_BUFFER_SMALL) ? buf[0] : 0;
 }
 
 static void ui_line(char c, int n)
@@ -35,80 +35,157 @@ static void ui_line(char c, int n)
 	putchar('\n');
 }
 
-static void ui_print_results(const result_t *results, int count)
+static void ui_print_results(const result_t *results, size_t count)
 {
-	printf("%12s %16s\n", "Antal", "Tid (sekunder)");
-	ui_line('-', MENU_WIDTH);
+    printf("%12s %16s\n", "Antal", "Tid (sekunder)");
+    ui_line('=', MENU_WIDTH);
 
-	for(int i=0; i<count; i++)
-	{
-		printf("%12d %16.9f\n", results[i].size, results[i].time);
-	}
+    for (size_t i = 0; i < count; i++)
+    {
+        printf("%12d %16.9f\n", results[i].size, results[i].time);
+    }
+
+    ui_line('-', MENU_WIDTH);
+	enter_continue();
 }
 
-static void ui_menu_options(const char *options[], int num_options)
+static void ui_printMenu(const char *options[], size_t count)
 {
-	int i;
+    ui_line('=', MENU_WIDTH);
 
-	for (i=0; i<num_options; i++)
-	{
-		printf("    %c) %s\n", 'a'+i, options[i]);
-	}
+    for (size_t i = 0; i < count; i++)
+    {
+        printf("    %c) %s\n", 'a' + (int)i, options[i]);
+    }
+
+    ui_line('-', MENU_WIDTH);
 }
-
-static void ui_menu()
-{
-	const char *options[] = 
-	{
-		"Menu",
-		"Exit\n",
-		"Bubble sort best case",
-		// TODO: complete menu
-	};
-
-	ui_line('=', MENU_WIDTH);
-	ui_menu_options(options, sizeof(options) / sizeof(char *));
-	ui_line('-', MENU_WIDTH);
-}
-
-
 
 //
 // Public
 //
 void ui_run()
 {
-	bool running, show_menu;
-	result_t result[RESULT_ROWS];
+	bool running = true;
+	menu_state_t menuState = main_menu;
 	
-	show_menu = true;
-	running = true;
+	algorithm_t algorithmChoice = algo_none_t;
+	case_t testcaseChoice = testcase_none_t;
+
+	result_t result[RESULT_ROWS];
+
 	while (running) 
 	{
-		if (show_menu) 
+		switch (menuState) 
 		{
-			show_menu = false;
-			ui_menu();
-		}
-		switch (ui_get_choice()) 
-		{
-			// House keeping
-			case 'a':
-				show_menu = true;
+			case main_menu:
+			{
+				algorithmChoice = algo_none_t;
+				testcaseChoice = testcase_none_t;
+
+				const char *mainMenuOptions[] = 
+				{
+					"Bubble sort",
+					"Insertion sort",
+					"Quick sort",
+					"Linear search",
+					"Binary search",
+					"Exit\n"
+				};
+				ui_printMenu(mainMenuOptions, sizeof(mainMenuOptions) / sizeof(mainMenuOptions[0]));
+				
+				switch (ui_get_choice()) 
+				{
+					case 'a':
+						algorithmChoice = bubble_sort_t;
+						break;
+					
+					case 'b':
+						algorithmChoice = insertion_sort_t;
+						break;
+
+					case 'c':
+						algorithmChoice = quick_sort_t;
+						break;
+
+					case 'd':
+						algorithmChoice = linear_search_t;
+						break;
+
+					case 'e':
+						algorithmChoice = binary_search_t;
+						break;
+
+					// Exit
+					case 'f':
+						running = false;
+						break;
+
+					// Invalid input
+					default:
+						ui_invalid_input();
+						break;
+				}
+
+				if(algorithmChoice != algo_none_t)
+				{
+					menuState = testcase_menu;
+				}
+					
 				break;
-			case 'b':
-				running = false;
+			}
+
+			case testcase_menu:
+			{
+				testcaseChoice = testcase_none_t;
+				const char *testcaseMenuOptions[] = 
+				{
+					"Best",
+					"Average",
+					"Worst",
+					"Back\n"
+				};
+				ui_printMenu(testcaseMenuOptions, sizeof(testcaseMenuOptions) / sizeof(testcaseMenuOptions[0]));
+
+				switch (ui_get_choice())
+				{
+					case 'a':
+						testcaseChoice = best_t;
+						break;
+
+					case 'b':
+						testcaseChoice = average_t;
+						break;
+
+					case 'c':
+						testcaseChoice = worst_t;
+						break;
+
+					case 'd':
+						menuState = main_menu;
+						break;
+
+					default:
+						ui_invalid_input();
+						break;
+				}
+
+				if (testcaseChoice != testcase_none_t)
+				{
+					menuState = main_menu;
+				}
+
 				break;
-			// Bubble sort
-			case 'c':
-				benchmark(bubble_sort_t, best_t, result, RESULT_ROWS);
-				ui_print_results(result, RESULT_ROWS);
-				break;
-			// Invalid input
+			}
+
 			default:
-				show_menu = false;
-				ui_invalid_input();
 				break;
+		}
+		
+		if(algorithmChoice != algo_none_t && testcaseChoice != testcase_none_t)
+		{
+			benchmark(algorithmChoice, testcaseChoice, result, RESULT_ROWS);
+			ui_print_results(result, RESULT_ROWS);
 		}
 	}
 	ui_exit();

@@ -68,8 +68,11 @@ static void prepare_input(algorithm_t algoritm, case_t test_case, int *values, i
             }
             break;
         
+        case linear_search_t:
+            fill_ascending(values, size);
+            break;
+
         default:
-            
             break;
     }    
 }
@@ -115,7 +118,7 @@ void benchmark(const algorithm_t a, const case_t c, result_t *buf, int n)
                 break;
 
             case insertion_sort_t:
-            for(int j=0; j<ITERATIONS; j++)
+                for(int j=0; j<ITERATIONS; j++)
                 {
                     prepare_input(a, c, testValues, elementCount);
 
@@ -133,7 +136,7 @@ void benchmark(const algorithm_t a, const case_t c, result_t *buf, int n)
                 break;
 
             case quick_sort_t:
-            for(int j=0; j<ITERATIONS; j++)
+                for(int j=0; j<ITERATIONS; j++)
                 {
                     prepare_input(a, c, testValues, elementCount);
 
@@ -152,6 +155,39 @@ void benchmark(const algorithm_t a, const case_t c, result_t *buf, int n)
 
             case linear_search_t:
                 //linear_search(values, n, v);
+                for(int j=0; j<ITERATIONS; j++)
+                {
+                    prepare_input(a, c, testValues, elementCount);
+                    
+                    int searchValue;
+                    switch(c)
+                    {
+                        case best_t:
+                            searchValue = testValues[0];
+                            break;
+
+                        case average_t:
+                            searchValue = testValues[rand() % elementCount];
+                            break;
+
+                        case worst_t:
+                            searchValue = -1;
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    struct timespec start, end;
+
+                    clock_gettime(CLOCK_MONOTONIC, &start);
+                    linear_search(testValues, elementCount, searchValue);
+                    clock_gettime(CLOCK_MONOTONIC, &end);
+
+                    const double seconds = (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec) / 1e9;
+
+                    totalTime += seconds;
+                }
                 break;
 
             case binary_search_t:
@@ -159,7 +195,7 @@ void benchmark(const algorithm_t a, const case_t c, result_t *buf, int n)
                 break;
             
             default:
-                
+                free(testValues);
                 break;
         }
 

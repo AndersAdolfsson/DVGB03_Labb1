@@ -65,5 +65,24 @@ bool linear_search(const int *a, int n, int v)
 
 bool binary_search(const int *a, int n, int v)
 {
-	return false; // TODO: binary search
+	int left = 0;
+	int right = n-1;
+	
+	while(left<=right)
+	{
+		int mid = left + (right-left) / 2;
+		if(a[mid]==v)
+		{
+			return true;
+		}
+		else if(a[mid] < v)
+		{
+			left = mid + 1;
+		}
+		else
+		{
+			right = mid - 1;
+		}
+	}
+	return false; 
 }

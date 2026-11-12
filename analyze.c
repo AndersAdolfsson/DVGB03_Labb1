@@ -2,9 +2,12 @@
 
 #include "analyze.h"
 #include "algorithm.h"
+#include "debug.h"
 
 #include <stdlib.h>
 #include <time.h>
+#include <stdio.h>
+#include <math.h>
 
 //
 // Private
@@ -42,13 +45,12 @@ static void fill_random(int *values, int size)
     }
 }
 
-static void prepare_input(algorithm_t algoritm, case_t test_case, int *values, int size)
+static void prepare_input(algorithm_t algorithm, case_t test_case, int *values, int size)
 {
-    // Each algorithm needs different data to be best/worst/average,
-    // pick appropriate helper function for each algorithm
-    switch (algoritm) 
+    switch (algorithm)
     {
         case bubble_sort_t:
+        case insertion_sort_t:
             switch (test_case)
             {
                 case best_t:
@@ -60,21 +62,53 @@ static void prepare_input(algorithm_t algoritm, case_t test_case, int *values, i
                     break;
 
                 case average_t:
-                    fill_random(values,size);
+                    fill_random(values, size);
                     break;
 
-                default: 
+                default:
                     break;
             }
             break;
-        
+
         case linear_search_t:
+        case binary_search_t:
             fill_ascending(values, size);
             break;
 
         default:
             break;
-    }    
+    }
+}
+
+static void print_array_overview(const char *message, const int *values, int size)
+{
+    printf("%s", message);
+
+    const int displayCount = 5;
+
+    if (size <= displayCount * 2)
+    {
+        for (int i = 0; i < size; i++)
+        {
+            printf("%d ", values[i]);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < displayCount; i++)
+        {
+            printf("%d ", values[i]);
+        }
+
+        printf("... ");
+
+        for (int i = size - displayCount; i < size; i++)
+        {
+            printf("%d ", values[i]);
+        }
+    }
+
+    printf("\n");
 }
 
 //
@@ -96,69 +130,48 @@ void benchmark(const algorithm_t a, const case_t c, result_t *buf, int n)
             return;
         }
 
-        switch (a) 
+        struct timespec start, end;
+
+        for(int j=0; j<ITERATIONS; j++)
         {
-            case bubble_sort_t:
+            prepare_input(a, c, testValues, elementCount);
+
+            if(debug_is_enabled())
             {
-                for(int j=0; j<ITERATIONS; j++)
+                print_array_overview("Array before : ", testValues, elementCount);
+            }
+
+            switch (a) 
+            {
+                case bubble_sort_t:
                 {
-                    prepare_input(a, c, testValues, elementCount);
-
-                    struct timespec start, end;
-
                     clock_gettime(CLOCK_MONOTONIC, &start);
                     bubble_sort(testValues, elementCount);
                     clock_gettime(CLOCK_MONOTONIC, &end);
 
-                    const double seconds = (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec) / 1e9;
-
-                    totalTime += seconds;
+                    break;
                 }
-            }
-                break;
 
-            case insertion_sort_t:
-                for(int j=0; j<ITERATIONS; j++)
+                case insertion_sort_t:
                 {
-                    prepare_input(a, c, testValues, elementCount);
-
-                    struct timespec start, end;
-
                     clock_gettime(CLOCK_MONOTONIC, &start);
                     insertion_sort(testValues, elementCount);
                     clock_gettime(CLOCK_MONOTONIC, &end);
 
-                    const double seconds = (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec) / 1e9;
-
-                    totalTime += seconds;
+                    break;
                 }
-                
-                break;
 
-            case quick_sort_t:
-                for(int j=0; j<ITERATIONS; j++)
+                case quick_sort_t:
                 {
-                    prepare_input(a, c, testValues, elementCount);
-
-                    struct timespec start, end;
-
                     clock_gettime(CLOCK_MONOTONIC, &start);
                     quick_sort(testValues, elementCount);
                     clock_gettime(CLOCK_MONOTONIC, &end);
-
-                    const double seconds = (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec) / 1e9;
-
-                    totalTime += seconds;
-                }
-                
-                break;
-
-            case linear_search_t:
-                //linear_search(values, n, v);
-                for(int j=0; j<ITERATIONS; j++)
-                {
-                    prepare_input(a, c, testValues, elementCount);
                     
+                    break;
+                }
+
+                case linear_search_t:
+                {
                     int searchValue;
                     switch(c)
                     {
@@ -171,32 +184,60 @@ void benchmark(const algorithm_t a, const case_t c, result_t *buf, int n)
                             break;
 
                         case worst_t:
-                            searchValue = -1;
+                            searchValue = elementCount;
                             break;
 
                         default:
-                            break;
+                            continue;
                     }
-
-                    struct timespec start, end;
-
+            
                     clock_gettime(CLOCK_MONOTONIC, &start);
                     linear_search(testValues, elementCount, searchValue);
                     clock_gettime(CLOCK_MONOTONIC, &end);
-
-                    const double seconds = (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec) / 1e9;
-
-                    totalTime += seconds;
+                    
+                    break;
                 }
-                break;
 
-            case binary_search_t:
-                //binary_search(values, n, v);
-                break;
-            
-            default:
-                free(testValues);
-                break;
+                case binary_search_t:
+                {
+                    int searchValue;
+
+                    switch (c)
+                    {
+                        case best_t:
+                            searchValue = testValues[(elementCount - 1) / 2];
+                            break;
+
+                        case average_t:
+                            searchValue = testValues[rand() % elementCount];
+                            break;
+
+                        case worst_t:
+                            searchValue = elementCount;
+                            break;
+
+                        default:
+                            continue;
+                    }
+
+                    clock_gettime(CLOCK_MONOTONIC, &start);
+                    binary_search(testValues, elementCount, searchValue);
+                    clock_gettime(CLOCK_MONOTONIC, &end);
+
+                    break;
+                }
+                    
+                default:
+                    continue;
+            }
+
+            if(debug_is_enabled())
+            {
+                print_array_overview("Array after : ", testValues, elementCount);
+            }
+
+            const double seconds = (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec) / 1e9;
+            totalTime += seconds;
         }
 
         buf[i].size = elementCount;

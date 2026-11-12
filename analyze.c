@@ -45,8 +45,7 @@ static void fill_random(int *values, int size)
     }
 }
 
-static void prepare_input(
-    algorithm_t algorithm, case_t test_case, int *values, int size)
+static void prepare_input(algorithm_t algorithm, case_t test_case, int *values, int size)
 {
     switch (algorithm)
     {
@@ -139,7 +138,7 @@ void benchmark(const algorithm_t a, const case_t c, result_t *buf, int n)
 
             if(debug_is_enabled())
             {
-                print_array_overview("Unsorted array : ", testValues, elementCount);
+                print_array_overview("Array before : ", testValues, elementCount);
             }
 
             switch (a) 
@@ -185,11 +184,11 @@ void benchmark(const algorithm_t a, const case_t c, result_t *buf, int n)
                             break;
 
                         case worst_t:
-                            searchValue = -1;
+                            searchValue = elementCount;
                             break;
 
                         default:
-                            break;
+                            continue;
                     }
             
                     clock_gettime(CLOCK_MONOTONIC, &start);
@@ -201,8 +200,31 @@ void benchmark(const algorithm_t a, const case_t c, result_t *buf, int n)
 
                 case binary_search_t:
                 {
-                    //binary_search(values, n, v);
-                    continue;
+                    int searchValue;
+
+                    switch (c)
+                    {
+                        case best_t:
+                            searchValue = testValues[(elementCount - 1) / 2];
+                            break;
+
+                        case average_t:
+                            searchValue = testValues[rand() % elementCount];
+                            break;
+
+                        case worst_t:
+                            searchValue = elementCount;
+                            break;
+
+                        default:
+                            continue;
+                    }
+
+                    clock_gettime(CLOCK_MONOTONIC, &start);
+                    binary_search(testValues, elementCount, searchValue);
+                    clock_gettime(CLOCK_MONOTONIC, &end);
+
+                    break;
                 }
                     
                 default:
@@ -211,7 +233,7 @@ void benchmark(const algorithm_t a, const case_t c, result_t *buf, int n)
 
             if(debug_is_enabled())
             {
-                print_array_overview("Sorted array : ", testValues, elementCount);
+                print_array_overview("Array after : ", testValues, elementCount);
             }
 
             const double seconds = (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec) / 1e9;

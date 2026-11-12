@@ -45,13 +45,13 @@ static void fill_random(int *values, int size)
     }
 }
 
-static void prepare_input(algorithm_t algoritm, case_t test_case, int *values, int size)
+static void prepare_input(
+    algorithm_t algorithm, case_t test_case, int *values, int size)
 {
-    // Each algorithm needs different data to be best/worst/average,
-    // pick appropriate helper function for each algorithm
-    switch (algoritm) 
+    switch (algorithm)
     {
         case bubble_sort_t:
+        case insertion_sort_t:
             switch (test_case)
             {
                 case best_t:
@@ -63,21 +63,22 @@ static void prepare_input(algorithm_t algoritm, case_t test_case, int *values, i
                     break;
 
                 case average_t:
-                    fill_random(values,size);
+                    fill_random(values, size);
                     break;
 
-                default: 
+                default:
                     break;
             }
             break;
-        
+
         case linear_search_t:
+        case binary_search_t:
             fill_ascending(values, size);
             break;
 
         default:
             break;
-    }    
+    }
 }
 
 static void print_array_overview(const char *message, const int *values, int size)

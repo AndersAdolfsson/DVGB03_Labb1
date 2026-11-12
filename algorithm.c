@@ -3,7 +3,34 @@
 //
 // Private
 //
+static void swap(int *x, int *y)
+{
+	int temp = *x;
+	*x = *y;
+	*y = temp;
+}
 
+static void sort_part(int *a, int left, int right)
+{
+	if(left >= right)
+	{
+		return;
+	}
+	int pivot = a[right];
+	int boundary = left;
+
+	for(int j = left; j < right; j++)
+	{
+		if(a[j] < pivot)
+		{
+			swap(&a[j], &a[boundary]);
+			boundary++;
+		}
+	}
+	swap(&a[right], &a[boundary]);
+	sort_part(a, left, boundary - 1);
+	sort_part(a, boundary + 1, right);
+}
 //
 // Public
 //
@@ -48,7 +75,10 @@ void insertion_sort(int *a, int n)
 
 void quick_sort(int *a, int n) 
 {
-	// TODO: quick sort
+	int left = 0;
+	int right = n-1;
+
+	sort_part(a, left, right);
 }
 
 bool linear_search(const int *a, int n, int v)
